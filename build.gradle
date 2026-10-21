@@ -1,0 +1,131 @@
+// Shulker Savvy Golems: when a copper golem looks for a chest to drop its item in, it also
+// searches the shulker boxes stored in that chest, and can put the item into one. Optional
+// targets: placed barrels, placed shulker boxes and ender chests. Server-only logic in a
+// universal mod (environment "*"): golem AI runs on the server, vanilla clients need nothing.
+// Depends on Fabric API only; no MenuKit or SlotKit.
+//
+// Build: `./gradlew :shulker-savvy-golems:build` from the workspace root (the composite
+// build in ~/Projects/Minecraft/Trevlar Mods). Test scene:
+// `test-gallery/run-scene.sh shulker-savvy-golems <scene>`.
+
+plugins {
+    // Loom 1.17 is the 26.2-era line; the version is pinned at the workspace root.
+    id 'net.fabricmc.fabric-loom' version '1.17-SNAPSHOT'
+    id 'java'
+    id 'com.modrinth.minotaur' version '2.+'
+}
+
+version = property('shulkersavvygolems_version')
+group   = property('maven_group')
+
+base.archivesName = 'shulker-savvy-golems'
+
+java {
+    // Minecraft 26.x runs on Java 25.
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+repositories {
+    maven { url 'https://maven.fabricmc.net/' }
+}
+
+dependencies {
+    // 26.x: the game is unobfuscated, so there is no mappings line and mod deps use
+    // the standard java configurations.
+    minecraft "com.mojang:minecraft:${property('minecraft_version')}"
+    implementation "net.fabricmc:fabric-loader:${property('loader_version')}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${property('fabric_version')}"
+}
+
+loom {
+    runs {
+        client { ideConfigGenerated = false }
+        server { ideConfigGenerated = false }
+        // Test Gallery: boots straight into the generated test world in run/saves/TestGallery.
+        // Generate it with `test-gallery/run-scene.sh shulker-savvy-golems <scene>` (which also runs this).
+        testGallery {
+            inherit client
+            name 'Test Gallery'
+            programArgs '--quickPlaySingleplayer', 'TestGallery'
+            ideConfigGenerated = false
+        }
+    }
+}
+
+// Self-checks: Fabric client gametests in src/gametest, run with
+// `./gradlew :shulker-savvy-golems:runClientGameTest`. Each one loads a Test Gallery scene's
+// check world (gen.py --checks) and asserts what a station with a matching "check" id says,
+// so Trev's walk-through keeps only what needs his eyes. The run opens its own window, runs
+// every check, and closes; it never touches run/ or a scene client.
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = 'shulkersavvygolems_checks'
+        enableGameTests = false
+        enableClientGameTests = true
+        eula = true
+    }
+}
+apply from: rootProject.file('Trevlar Mods Codebases/test-gallery/kit/checks.gradle')   // SceneWorld
+
+jar {
+    from('LICENSE') { rename { "${it}_${project.name}" } }
+}
+
+// Stamp the real project version into fabric.mod.json at build. The manifest
+// declares "version": "${version}"; a hardcoded manifest version silently breaks
+// every dependency gate against this mod.
+processResources {
+    inputs.property "version", project.version
+    filesMatching("fabric.mod.json") {
+        expand "version": inputs.properties.version
+    }
+}
+
+// ── Modrinth Publishing ────────────────────────────────────────────────
+// Lead creates the Modrinth project (new-mod-setup.md) and fills in the project id
+// here. Only Lead runs these tasks.
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+    // No Modrinth project until Trev approves the first release (new-mod-setup.md step 7).
+    // Left empty so a publish fails instead of creating one.
+    projectId = ""
+    versionNumber = property('shulkersavvygolems_version')
+    versionName = "Shulker Savvy Golems ${property('shulkersavvygolems_version')}"
+    versionType = "release"
+    // ci-cd.md stage 5: the player-facing changelog lives in changelog.md, one entry,
+    // overwritten each release (git keeps the history).
+    changelog = file('changelog.md').text
+    // ci-cd.md stage 7: the README is the public description; `modrinthSyncBody` pushes it.
+    syncBodyFrom = file('README.md').text
+    // 26.x: no remap step — `jar` IS the shippable artifact.
+    uploadFile = jar
+    gameVersions = [property('minecraft_version')]
+    loaders = ["fabric"]
+    dependencies {
+        required.project "fabric-api"
+    }
+}
+
+// The shipped jar must self-report the bumped version. A jar that says the wrong
+// version silently breaks every dependency gate against it, so this fails the build
+// instead of relying on someone remembering to unzip and look.
+tasks.register('verifyJarVersion') {
+    dependsOn 'jar'
+    doLast {
+        def jar = tasks.named('jar').get().archiveFile.get().asFile
+        def modJson = zipTree(jar).matching { include 'fabric.mod.json' }.singleFile
+        def stamped = new groovy.json.JsonSlurper().parse(modJson).version
+        if (stamped != project.version.toString()) {
+            throw new GradleException("${jar.name}: fabric.mod.json says ${stamped}, expected ${project.version}")
+        }
+        println "verifyJarVersion: ${jar.name} reports ${stamped}"
+    }
+}
+build.dependsOn verifyJarVersion
+
+// Kit range check: the workspace root build supplies its logic (it replaces this
+// task's action in every subproject), so it is only registered here.
+tasks.register('verifyKitRanges')
+build.dependsOn verifyKitRanges
