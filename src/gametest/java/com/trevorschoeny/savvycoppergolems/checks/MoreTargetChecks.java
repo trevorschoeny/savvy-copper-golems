@@ -1,7 +1,9 @@
 package com.trevorschoeny.savvycoppergolems.checks;
 
+import com.google.gson.JsonArray;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
@@ -19,6 +21,7 @@ public class MoreTargetChecks implements FabricClientGameTest {
     public void runTest(ClientGameTestContext ctx) {
         try (SceneWorld.Opened scene = SceneWorld.open(ctx, "savvy-copper-golems", "more-targets")) {
             Stations.waitForEmptyHands(ctx, scene, EMPTIES);
+            Stations.waitUntil(ctx, scene, s -> Stations.looseCobble(barrelOf(s, scene)) == 6);
             ctx.waitTicks(100);   // the golems that should keep their item have had their look too
             scene.world().getServer().runOnServer(s -> {
                 loose(s, scene, "savvycoppergolems:barrel", 21);
@@ -27,6 +30,7 @@ public class MoreTargetChecks implements FabricClientGameTest {
                 shulkerInBarrel(s, scene);
                 lidBlocked(s, scene);
                 placedNoNesting(s, scene);
+                copperChestToBarrel(s, scene);
             });
         }
     }
@@ -59,5 +63,27 @@ public class MoreTargetChecks implements FabricClientGameTest {
         String id = "savvycoppergolems:placed_no_nesting";
         if (!Stations.hand(s, "scg_nest").is(Items.SHULKER_BOX)) throw new AssertionError(id + ": golem should still hold its shulker box");
         if (!Stations.container(s, scene, id).isEmpty()) throw new AssertionError(id + ": the placed shulker box should still be empty");
+    }
+
+    /**
+     * Station copper_chest_to_barrel: picking up still works as vanilla (barrels are never a
+     * source), and what the golem picked up goes into the barrel.
+     */
+    private static void copperChestToBarrel(MinecraftServer s, SceneWorld.Opened scene) {
+        String id = "savvycoppergolems:copper_chest_to_barrel";
+        int inBarrel = Stations.looseCobble(barrelOf(s, scene));
+        if (inBarrel != 6) throw new AssertionError(id + ": barrel should hold 6 cobblestone; holds " + inBarrel);
+        if (!copperChestOf(s, scene).isEmpty()) throw new AssertionError(id + ": the copper chest should be empty");
+    }
+
+    private static Container barrelOf(MinecraftServer s, SceneWorld.Opened scene) { return at(s, scene, 3); }
+    private static Container copperChestOf(MinecraftServer s, SceneWorld.Opened scene) { return at(s, scene, 1); }
+
+    /** The loop station's container at (x, 0, 4). */
+    private static Container at(MinecraftServer s, SceneWorld.Opened scene, int x) {
+        JsonArray o = scene.station("savvycoppergolems:copper_chest_to_barrel").getAsJsonArray("origin");
+        BlockPos pos = new BlockPos(o.get(0).getAsInt() + x, o.get(1).getAsInt(), o.get(2).getAsInt() + 4);
+        if (!(s.overworld().getBlockEntity(pos) instanceof Container c)) throw new AssertionError("copper_chest_to_barrel: no container at " + pos);
+        return c;
     }
 }

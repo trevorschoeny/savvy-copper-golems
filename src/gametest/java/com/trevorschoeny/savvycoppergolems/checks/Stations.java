@@ -16,6 +16,7 @@ import testgallery.SceneWorld;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * What every scene in this mod shares: each station has one copper golem, tagged, and one
@@ -27,7 +28,12 @@ final class Stations {
 
     /** The golems all work at once: wait (up to a minute) until every tagged one has emptied its hand. */
     static void waitForEmptyHands(ClientGameTestContext ctx, SceneWorld.Opened scene, String... tags) {
-        for (int t = 0; t < 60 && !scene.world().getServer().computeOnServer(s -> allEmpty(s, tags)); t++) ctx.waitTicks(20);
+        waitUntil(ctx, scene, s -> allEmpty(s, tags));
+    }
+
+    /** Waits up to a minute for the server's world to reach a state; the checks after it say whether it did. */
+    static void waitUntil(ClientGameTestContext ctx, SceneWorld.Opened scene, Predicate<MinecraftServer> done) {
+        for (int t = 0; t < 60 && !scene.world().getServer().computeOnServer(done::test); t++) ctx.waitTicks(20);
     }
 
     private static boolean allEmpty(MinecraftServer s, String[] tags) {
