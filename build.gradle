@@ -1,7 +1,8 @@
 // Savvy Copper Golems: copper golems sort into the shulker boxes stored in a chest, and
 // (on by default) into placed barrels and shulker boxes too. Their search limits are
 // settings. Server-only logic in a universal mod (environment "*"): golem AI runs on the
-// server, vanilla clients need nothing. Depends on Fabric API only; no MenuKit or SlotKit.
+// server, vanilla clients need nothing. The client half is only the YACL settings screen.
+// Depends on Fabric API; YACL is bundled. No MenuKit or SlotKit.
 //
 // Build: `./gradlew :savvy-copper-golems:build` from the workspace root (the composite
 // build in ~/Projects/Minecraft/Trevlar Mods). Test scene:
@@ -27,6 +28,10 @@ java {
 
 repositories {
     maven { url 'https://maven.fabricmc.net/' }
+    // ModMenu, from Terraformers' Maven.
+    maven { url 'https://maven.terraformersmc.com/releases/' }
+    // YACL: the 26.x builds are only on this Maven repository.
+    maven { url 'https://api.modrinth.com/maven' }
 }
 
 dependencies {
@@ -35,6 +40,15 @@ dependencies {
     minecraft "com.mojang:minecraft:${property('minecraft_version')}"
     implementation "net.fabricmc:fabric-loader:${property('loader_version')}"
     implementation "net.fabricmc.fabric-api:fabric-api:${property('fabric_version')}"
+
+    // ModMenu surfaces the settings screen from the mods list. Soft dep at runtime:
+    // compileOnly for the API, localRuntime for the dev launch.
+    compileOnly "com.terraformersmc:modmenu:21.0.0"
+    localRuntime "com.terraformersmc:modmenu:21.0.0"
+
+    // YACL, the settings-screen framework, is bundled into the jar (Jar-in-Jar).
+    implementation "maven.modrinth:yacl:3.9.7+26.3-fabric"
+    include        "maven.modrinth:yacl:3.9.7+26.3-fabric"
 }
 
 loom {

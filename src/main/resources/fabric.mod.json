@@ -13,6 +13,14 @@
   },
   "license": "MIT",
   "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.trevorschoeny.savvycoppergolems.SavvyCopperGolems"
+    ],
+    "modmenu": [
+      "com.trevorschoeny.savvycoppergolems.config.SavvyConfigModMenu"
+    ]
+  },
   "mixins": [
     "savvycoppergolems.mixins.json"
   ],
