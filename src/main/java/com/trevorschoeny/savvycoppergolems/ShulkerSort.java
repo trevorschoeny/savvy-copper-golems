@@ -1,4 +1,4 @@
-package com.trevorschoeny.shulkersavvygolems;
+package com.trevorschoeny.savvycoppergolems;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.Container;

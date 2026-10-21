@@ -1,12 +1,11 @@
-// Shulker Savvy Golems: when a copper golem looks for a chest to drop its item in, it also
-// searches the shulker boxes stored in that chest, and can put the item into one. Optional
-// targets: placed barrels, placed shulker boxes and ender chests. Server-only logic in a
-// universal mod (environment "*"): golem AI runs on the server, vanilla clients need nothing.
-// Depends on Fabric API only; no MenuKit or SlotKit.
+// Savvy Copper Golems: copper golems sort into the shulker boxes stored in a chest, and
+// (on by default) into placed barrels and shulker boxes too. Their search limits are
+// settings. Server-only logic in a universal mod (environment "*"): golem AI runs on the
+// server, vanilla clients need nothing. Depends on Fabric API only; no MenuKit or SlotKit.
 //
-// Build: `./gradlew :shulker-savvy-golems:build` from the workspace root (the composite
+// Build: `./gradlew :savvy-copper-golems:build` from the workspace root (the composite
 // build in ~/Projects/Minecraft/Trevlar Mods). Test scene:
-// `test-gallery/run-scene.sh shulker-savvy-golems <scene>`.
+// `test-gallery/run-scene.sh savvy-copper-golems <scene>`.
 
 plugins {
     // Loom 1.17 is the 26.2-era line; the version is pinned at the workspace root.
@@ -15,10 +14,10 @@ plugins {
     id 'com.modrinth.minotaur' version '2.+'
 }
 
-version = property('shulkersavvygolems_version')
+version = property('savvycoppergolems_version')
 group   = property('maven_group')
 
-base.archivesName = 'shulker-savvy-golems'
+base.archivesName = 'savvy-copper-golems'
 
 java {
     // Minecraft 26.x runs on Java 25.
@@ -43,7 +42,7 @@ loom {
         client { ideConfigGenerated = false }
         server { ideConfigGenerated = false }
         // Test Gallery: boots straight into the generated test world in run/saves/TestGallery.
-        // Generate it with `test-gallery/run-scene.sh shulker-savvy-golems <scene>` (which also runs this).
+        // Generate it with `test-gallery/run-scene.sh savvy-copper-golems <scene>` (which also runs this).
         testGallery {
             inherit client
             name 'Test Gallery'
@@ -54,14 +53,14 @@ loom {
 }
 
 // Self-checks: Fabric client gametests in src/gametest, run with
-// `./gradlew :shulker-savvy-golems:runClientGameTest`. Each one loads a Test Gallery scene's
+// `./gradlew :savvy-copper-golems:runClientGameTest`. Each one loads a Test Gallery scene's
 // check world (gen.py --checks) and asserts what a station with a matching "check" id says,
 // so Trev's walk-through keeps only what needs his eyes. The run opens its own window, runs
 // every check, and closes; it never touches run/ or a scene client.
 fabricApi {
     configureTests {
         createSourceSet = true
-        modId = 'shulkersavvygolems_checks'
+        modId = 'savvycoppergolems_checks'
         enableGameTests = false
         enableClientGameTests = true
         eula = true
@@ -91,8 +90,8 @@ modrinth {
     // No Modrinth project until Trev approves the first release (new-mod-setup.md step 7).
     // Left empty so a publish fails instead of creating one.
     projectId = ""
-    versionNumber = property('shulkersavvygolems_version')
-    versionName = "Shulker Savvy Golems ${property('shulkersavvygolems_version')}"
+    versionNumber = property('savvycoppergolems_version')
+    versionName = "Savvy Copper Golems ${property('savvycoppergolems_version')}"
     versionType = "release"
     // ci-cd.md stage 5: the player-facing changelog lives in changelog.md, one entry,
     // overwritten each release (git keeps the history).

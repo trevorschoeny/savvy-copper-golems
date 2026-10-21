@@ -1,7 +1,7 @@
-package com.trevorschoeny.shulkersavvygolems.mixin;
+package com.trevorschoeny.savvycoppergolems.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.trevorschoeny.shulkersavvygolems.ShulkerSort;
+import com.trevorschoeny.savvycoppergolems.ShulkerSort;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.behavior.TransportItemsBetweenContainers;
@@ -20,13 +20,13 @@ abstract class TransportItemsBetweenContainersMixin {
 
     /** A chest also matches when a shulker in it would take the held item. */
     @ModifyReturnValue(method = "matchesLeavingItemsRequirement", at = @At("RETURN"))
-    private static boolean shulkersavvygolems$orAShulkerTakes(boolean vanilla, PathfinderMob body, Container container) {
+    private static boolean savvycoppergolems$orAShulkerTakes(boolean vanilla, PathfinderMob body, Container container) {
         return vanilla || ShulkerSort.aShulkerTakes(container, body.getMainHandItem());
     }
 
     /** Fill the chest in strict slot order, shulker slots included. Vanilla when it holds no shulker. */
     @Inject(method = "addItemsToContainer", at = @At("HEAD"), cancellable = true)
-    private static void shulkersavvygolems$strictSlotWalk(PathfinderMob body, Container container, CallbackInfoReturnable<ItemStack> cir) {
+    private static void savvycoppergolems$strictSlotWalk(PathfinderMob body, Container container, CallbackInfoReturnable<ItemStack> cir) {
         cir.setReturnValue(ShulkerSort.insert(container, body.getMainHandItem()));
     }
 }

@@ -1,20 +1,20 @@
 {
   "schemaVersion": 1,
-  "id": "shulkersavvygolems",
+  "id": "savvycoppergolems",
   "version": "${version}",
-  "name": "Shulker Savvy Golems",
-  "description": "Copper golems sort into the shulker boxes stored in chests.",
+  "name": "Savvy Copper Golems",
+  "description": "Copper golems sort into shulker boxes stored in chests, and into barrels and placed shulker boxes.",
   "authors": [
     "trevorschoeny"
   ],
   "contact": {
-    "homepage": "https://modrinth.com/mod/shulker-savvy-golems",
-    "sources": "https://github.com/trevorschoeny/shulker-savvy-golems"
+    "homepage": "https://modrinth.com/mod/savvy-copper-golems",
+    "sources": "https://github.com/trevorschoeny/savvy-copper-golems"
   },
   "license": "MIT",
   "environment": "*",
   "mixins": [
-    "shulkersavvygolems.mixins.json"
+    "savvycoppergolems.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.15.0",
