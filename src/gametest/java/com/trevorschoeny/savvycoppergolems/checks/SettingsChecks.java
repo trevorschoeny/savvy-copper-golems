@@ -7,9 +7,6 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Container;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import testgallery.SceneWorld;
@@ -65,7 +62,7 @@ public class SettingsChecks implements FabricClientGameTest {
                 Map<String, String> atRest = new HashMap<>();
                 for (int t = 0; t < 120 && atRest.size() < SPOTS.length; t++) {
                     scene.world().getServer().runOnServer(s -> {
-                        for (Spot spot : SPOTS) if (!atRest.containsKey(spot.id()) && resting(s, spot.tag())) atRest.put(spot.id(), state(s, scene, spot));
+                        for (Spot spot : SPOTS) if (!atRest.containsKey(spot.id()) && Stations.resting(s, spot.tag())) atRest.put(spot.id(), state(s, scene, spot));
                     });
                     ctx.waitTicks(10);
                 }
@@ -88,30 +85,9 @@ public class SettingsChecks implements FabricClientGameTest {
         SavvyConfig.setMaxVisits(SavvyConfig.VANILLA_MAX_VISITS);
     }
 
-    /**
-     * The golems are summoned here, not by the scene: vanilla gives a new golem a 3 to 5 second
-     * rest, during which it wanders and could leave its ledge. Clearing that rest in the same
-     * tick as the summon means each golem's first search happens where it was put, and the first
-     * rest it takes afterwards is its own decision.
-     */
+    /** The golems are summoned by the test, not the scene; see {@link Stations#summon}. */
     private static void summonGolems(MinecraftServer s, SceneWorld.Opened scene) {
-        for (Spot spot : SPOTS) {
-            JsonArray o = scene.station(spot.id()).getAsJsonArray("origin");
-            double x = o.get(0).getAsInt() + 2.5, y = o.get(1).getAsInt() + spot.golemY(), z = o.get(2).getAsInt() + 2.5;
-            s.getCommands().performPrefixedCommand(s.createCommandSourceStack(), "summon minecraft:copper_golem " + x + " " + y + " " + z
-                    + " {Tags:[\"scs\",\"" + spot.tag() + "\"],equipment:{mainhand:{id:\"minecraft:cobblestone\",count:16}}}");
-            golem(s, spot.tag()).getBrain().eraseMemory(MemoryModuleType.TRANSPORT_ITEMS_COOLDOWN_TICKS);
-        }
-    }
-
-    private static LivingEntity golem(MinecraftServer s, String tag) {
-        for (Entity e : s.overworld().getAllEntities())
-            if (e.entityTags().contains(tag) && e instanceof LivingEntity l) return l;
-        throw new AssertionError("no golem tagged " + tag);
-    }
-
-    private static boolean resting(MinecraftServer s, String tag) {
-        return golem(s, tag).getBrain().getMemory(MemoryModuleType.TRANSPORT_ITEMS_COOLDOWN_TICKS).isPresent();
+        for (Spot spot : SPOTS) Stations.summon(s, scene, spot.id(), spot.tag(), spot.golemY(), "minecraft:cobblestone 16");
     }
 
     private static String state(MinecraftServer s, SceneWorld.Opened scene, Spot spot) {

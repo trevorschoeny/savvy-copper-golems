@@ -14,7 +14,7 @@ import net.minecraft.network.chat.Component;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-/** YACL screen: one tab, a group for where golems sort and a group for how far they look. */
+/** YACL screen: one tab, with groups for where golems sort, how much they carry and how far they look. */
 public final class SavvyConfigScreen {
 
     private SavvyConfigScreen() {}
@@ -25,7 +25,12 @@ public final class SavvyConfigScreen {
         OptionGroup targets = OptionGroup.createBuilder()
                 .name(Component.literal("Where golems sort"))
                 .description(OptionDescription.of(Component.literal(
-                        "Golems always sort into chests, and into the shulker boxes stored in them.")))
+                        "Golems always sort into chests. These add more places they sort into.")))
+                .option(booleanOption("Shulker boxes in chests and barrels",
+                        "Golems look inside the shulker boxes stored in a chest or barrel, and put "
+                                + "their item into a box that holds it. Off, a stored shulker box is just "
+                                + "another item in the chest." + SERVER_NOTE,
+                        true, SavvyConfig::shulkersInside, SavvyConfig::setShulkersInside))
                 .option(booleanOption("Barrels",
                         "Golems sort into placed barrels the same way they do into chests, "
                                 + "shulker boxes stored inside included." + SERVER_NOTE,
@@ -34,6 +39,15 @@ public final class SavvyConfigScreen {
                         "Golems sort into shulker boxes placed as blocks. A golem never puts a "
                                 + "shulker box into one." + SERVER_NOTE,
                         true, SavvyConfig::placedShulkers, SavvyConfig::setPlacedShulkers))
+                .build();
+
+        OptionGroup carrying = OptionGroup.createBuilder()
+                .name(Component.literal("How much golems carry"))
+                .option(intOption("Items carried",
+                        "How many items a golem takes from a copper chest at once, up to a full stack. Vanilla: "
+                                + SavvyConfig.VANILLA_CARRY + "." + SERVER_NOTE,
+                        SavvyConfig.VANILLA_CARRY, SavvyConfig.CARRY_CAP,
+                        SavvyConfig::carry, SavvyConfig::setCarry))
                 .build();
 
         OptionGroup limits = OptionGroup.createBuilder()
@@ -63,6 +77,7 @@ public final class SavvyConfigScreen {
                 .category(ConfigCategory.createBuilder()
                         .name(Component.literal("Golems"))
                         .group(targets)
+                        .group(carrying)
                         .group(limits)
                         .build())
                 .build()

@@ -29,11 +29,12 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * The copper golem's sorting behaviour. Three things change:
+ * The copper golem's sorting behaviour. Four things change:
  * <ul>
  *   <li>On arrival at a container, the shulkers stored in it count too (see {@link ShulkerSort}).</li>
  *   <li>Placed barrels and shulker boxes are destinations as well as chests (see {@link ExtraTargets}).</li>
  *   <li>The search range and the number of containers checked before giving up are settings.</li>
+ *   <li>How many items a golem takes from a copper chest at once is a setting.</li>
  * </ul>
  * Everything else (pathing, queuing, the 60-tick look, memory of visited containers) is vanilla.
  */
@@ -58,13 +59,19 @@ abstract class TransportItemsBetweenContainersMixin {
     private static boolean savvycoppergolems$orAShulkerTakes(boolean vanilla, PathfinderMob body, Container container) {
         ItemStack held = body.getMainHandItem();
         if (ExtraTargets.refuses(container, held)) return false;
-        return vanilla || ShulkerSort.aShulkerTakes(container, held);
+        return vanilla || SavvyConfig.shulkersInside() && ShulkerSort.aShulkerTakes(container, held);
     }
 
-    /** Fill the container in strict slot order, shulker slots included. Vanilla when it holds no shulker. */
+    /** Fill the container in strict slot order, shulker slots included. Vanilla when it holds no shulker, or the setting is off. */
     @Inject(method = "addItemsToContainer", at = @At("HEAD"), cancellable = true)
     private static void savvycoppergolems$strictSlotWalk(PathfinderMob body, Container container, CallbackInfoReturnable<ItemStack> cir) {
-        cir.setReturnValue(ShulkerSort.insert(container, body.getMainHandItem()));
+        if (SavvyConfig.shulkersInside()) cir.setReturnValue(ShulkerSort.insert(container, body.getMainHandItem()));
+    }
+
+    /** How many items a golem takes from a copper chest at once (vanilla: 16). */
+    @ModifyExpressionValue(method = "pickupItemFromContainer", at = @At(value = "CONSTANT", args = "intValue=16"))
+    private static int savvycoppergolems$carry(int vanilla) {
+        return SavvyConfig.carry();
     }
 
     // ---- Which containers count -----------------------------------------------------------
