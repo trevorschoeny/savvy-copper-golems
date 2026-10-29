@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * Savvy Copper Golems settings (Trev, 2026-10-21): sorting into shulkers stored in containers
+ * Savvy Copper Golems settings: sorting into shulkers stored in containers
  * and the two extra targets, all on by default; crammed golems staying stacked (on); how much a golem carries and its three search
  * limits, defaulting to vanilla's numbers. Same static-field + JSON shape as the other house
  * mods, persisted to {@code config/savvycoppergolems/config.json}.
@@ -36,7 +36,7 @@ public final class SavvyConfig {
     public static final int VANILLA_VERTICAL = 8;
     public static final int VANILLA_CARRY = 16;
 
-    // ponytail: caps keep a typo from making every golem scan hundreds of chunks per search.
+    // Caps keep a typo from making every golem scan hundreds of chunks per search.
     public static final int MAX_VISITS_CAP = 64;
     public static final int HORIZONTAL_CAP = 128;
     public static final int VERTICAL_CAP = 64;

@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * The containers a golem may drop items into on top of vanilla's chests (Trev, 2026-10-21):
+ * The containers a golem may drop items into on top of vanilla's chests:
  * placed barrels and placed shulker boxes, each behind its own setting, both on by default.
  * Ender chests are deliberately not here: a golem has no player whose ender chest it would fill.
  *

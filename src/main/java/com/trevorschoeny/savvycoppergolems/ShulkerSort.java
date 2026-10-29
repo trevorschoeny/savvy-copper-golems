@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 /**
  * How a copper golem drops its item into a chest that holds shulker boxes.
  *
- * <p>The rule (Trev, 2026-10-20): every shulker in the chest is treated exactly like a chest
+ * <p>The rule: every shulker in the chest is treated exactly like a chest
  * the golem just opened, and the chest's own loose slots are one more "chest". The golem
  * walks the chest in strict slot order: a loose slot is filled the vanilla way if the chest
  * itself would take the item, a shulker slot is filled the vanilla way if that shulker would
@@ -98,7 +98,7 @@ public final class ShulkerSort {
     private static SimpleContainer contents(ItemStack stack) {
         if (!(stack.getItem() instanceof BlockItem item && item.getBlock() instanceof ShulkerBoxBlock)) return null;
         ItemContainerContents contents = stack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
-        // ponytail: 27 slots, or more if the box already holds more (Shulker Palette's extra rows).
+        // 27 slots, or more if the box already holds more (Shulker Palette's extra rows).
         SimpleContainer box = new SimpleContainer(Math.max(27, contents.size()));
         contents.copyInto(box.getItems());
         return box;
