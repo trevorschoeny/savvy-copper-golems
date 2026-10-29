@@ -12,6 +12,7 @@
     "sources": "https://github.com/trevorschoeny/savvy-copper-golems"
   },
   "license": "MIT",
+  "icon": "assets/savvycoppergolems/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
