@@ -8,7 +8,8 @@
       "com.trevorschoeny.savvycoppergolems.checks.IntoShulkerChecks",
       "com.trevorschoeny.savvycoppergolems.checks.MoreTargetChecks",
       "com.trevorschoeny.savvycoppergolems.checks.SettingsChecks",
-      "com.trevorschoeny.savvycoppergolems.checks.CarryAndShulkerChecks"
+      "com.trevorschoeny.savvycoppergolems.checks.CarryAndShulkerChecks",
+      "com.trevorschoeny.savvycoppergolems.checks.StayStackedChecks"
     ]
   }
 }

@@ -14,7 +14,7 @@ import net.minecraft.network.chat.Component;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-/** YACL screen: one tab, with groups for where golems sort, how much they carry and how far they look. */
+/** YACL screen: one tab, with groups for where golems sort, how much they carry, crammed golems, and how far they look. */
 public final class SavvyConfigScreen {
 
     private SavvyConfigScreen() {}
@@ -50,6 +50,15 @@ public final class SavvyConfigScreen {
                         SavvyConfig::carry, SavvyConfig::setCarry))
                 .build();
 
+        OptionGroup crowds = OptionGroup.createBuilder()
+                .name(Component.literal("Crammed golems"))
+                .option(booleanOption("Stay stacked",
+                        "Copper golems crammed into one block stay stacked on one spot instead of "
+                                + "pushing apart when one is nudged a little. Two golems within 0.1 blocks "
+                                + "of each other don't push each other (vanilla: 0.01)." + SERVER_NOTE,
+                        true, SavvyConfig::stayStacked, SavvyConfig::setStayStacked))
+                .build();
+
         OptionGroup limits = OptionGroup.createBuilder()
                 .name(Component.literal("How far golems look"))
                 .description(OptionDescription.of(Component.literal(
@@ -78,6 +87,7 @@ public final class SavvyConfigScreen {
                         .name(Component.literal("Golems"))
                         .group(targets)
                         .group(carrying)
+                        .group(crowds)
                         .group(limits)
                         .build())
                 .build()

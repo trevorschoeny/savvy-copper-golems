@@ -16,7 +16,7 @@ import java.nio.file.Path;
 
 /**
  * Savvy Copper Golems settings (Trev, 2026-10-21): sorting into shulkers stored in containers
- * and the two extra targets, all on by default; how much a golem carries and its three search
+ * and the two extra targets, all on by default; crammed golems staying stacked (on); how much a golem carries and its three search
  * limits, defaulting to vanilla's numbers. Same static-field + JSON shape as the other house
  * mods, persisted to {@code config/savvycoppergolems/config.json}.
  *
@@ -45,6 +45,10 @@ public final class SavvyConfig {
 
     // Golems look inside the shulker boxes stored in a chest or barrel. Off: vanilla's chest rule.
     private static boolean shulkersInside = true;
+
+    // Crammed golems stay stacked: two copper golems within 0.1 blocks of each other (vanilla:
+    // 0.01) don't push each other apart, so a nudge doesn't scatter a crowd around its block.
+    private static boolean stayStacked = true;
 
     // Golems sort into placed barrels, the same way they do into chests.
     private static boolean barrels = true;
@@ -77,6 +81,7 @@ public final class SavvyConfig {
         try {
             JsonObject root = JsonParser.parseString(Files.readString(path)).getAsJsonObject();
             shulkersInside = readBool(root, "shulkersInside", shulkersInside);
+            stayStacked = readBool(root, "stayStacked", stayStacked);
             barrels = readBool(root, "barrels", barrels);
             placedShulkers = readBool(root, "placedShulkers", placedShulkers);
             maxVisits = readInt(root, "maxVisits", maxVisits, MAX_VISITS_CAP);
@@ -113,6 +118,7 @@ public final class SavvyConfig {
             JsonObject root = new JsonObject();
             root.addProperty("version", CURRENT_VERSION);
             root.addProperty("shulkersInside", shulkersInside);
+            root.addProperty("stayStacked", stayStacked);
             root.addProperty("barrels", barrels);
             root.addProperty("placedShulkers", placedShulkers);
             root.addProperty("maxVisits", maxVisits);
@@ -127,6 +133,9 @@ public final class SavvyConfig {
 
     public static boolean shulkersInside() { return shulkersInside; }
     public static void setShulkersInside(boolean v) { shulkersInside = v; save(); }
+
+    public static boolean stayStacked() { return stayStacked; }
+    public static void setStayStacked(boolean v) { stayStacked = v; save(); }
 
     public static boolean barrels() { return barrels; }
     public static void setBarrels(boolean v) { barrels = v; save(); }
