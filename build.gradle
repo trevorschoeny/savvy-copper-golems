@@ -103,7 +103,7 @@ modrinth {
     token = System.getenv("MODRINTH_TOKEN")
     // No Modrinth project until Trev approves the first release (new-mod-setup.md step 7).
     // Left empty so a publish fails instead of creating one.
-    projectId = ""
+    projectId = "ezd7hlcR"
     versionNumber = property('savvycoppergolems_version')
     versionName = "Savvy Copper Golems ${property('savvycoppergolems_version')}"
     versionType = "release"
