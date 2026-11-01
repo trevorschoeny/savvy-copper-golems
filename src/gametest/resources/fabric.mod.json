@@ -10,7 +10,8 @@
       "com.trevorschoeny.savvycoppergolems.checks.SettingsChecks",
       "com.trevorschoeny.savvycoppergolems.checks.CarryAndShulkerChecks",
       "com.trevorschoeny.savvycoppergolems.checks.StayStackedChecks",
-      "com.trevorschoeny.savvycoppergolems.checks.StorageRoomChecks"
+      "com.trevorschoeny.savvycoppergolems.checks.StorageRoomChecks",
+      "com.trevorschoeny.savvycoppergolems.checks.InterruptedVisitChecks"
     ]
   }
 }

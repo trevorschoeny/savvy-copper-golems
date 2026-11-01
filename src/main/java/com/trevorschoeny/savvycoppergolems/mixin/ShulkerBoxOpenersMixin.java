@@ -22,8 +22,6 @@ import java.util.List;
  */
 @Mixin(ShulkerBoxBlockEntity.class)
 abstract class ShulkerBoxOpenersMixin {
-    // A golem interrupted mid-visit (hit, leashed) never closes, so the lid stays up until the
-    // chunk reloads. Chests close by a range recheck; add one here if that shows up.
     @Unique private final List<ContainerUser> savvycoppergolems$golems = new ArrayList<>();
 
     @Inject(method = "startOpen", at = @At("TAIL"))

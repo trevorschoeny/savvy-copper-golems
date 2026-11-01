@@ -16,9 +16,9 @@ import testgallery.SceneWorld;
  * 15 chests and barrels of dirt, and the chest whose shulker holds cobblestone in the far corner,
  * so it is the 16th container from the golem.
  *
- * <p>A golem checks containers nearest first and gives up after the search limit (vanilla: 10),
- * forgetting what it checked. With the default it never reaches the far chest; with the limit
- * raised past the room's size it does. Barrels count towards the limit, since this mod makes
+ * <p>A golem checks containers nearest first and gives up after the search limit, forgetting
+ * what it checked. At vanilla's 10 it never reaches the far chest; at this mod's default (32) it
+ * does. Barrels count towards the limit, since this mod makes
  * them destinations.
  */
 public class StorageRoomChecks implements FabricClientGameTest {
@@ -34,18 +34,18 @@ public class StorageRoomChecks implements FabricClientGameTest {
                 // Ten 3-second looks plus the walking: wait for the golem to give up the first time.
                 Stations.waitUntil(ctx, scene, 120, s -> Stations.resting(s, TAG));
                 String got = scene.world().getServer().computeOnServer(s -> state(s, scene));
-                if (!got.equals("golem 16, shulker 5")) throw new AssertionError(ID + " with the default limit: when the golem first rested it should be golem 16, shulker 5; was " + got);
+                if (!got.equals("golem 16, shulker 5")) throw new AssertionError(ID + " with vanilla's limit: when the golem first rested it should be golem 16, shulker 5; was " + got);
             }
 
-            SavvyConfig.setMaxVisits(20);
+            SavvyConfig.setMaxVisits(SavvyConfig.DEFAULT_MAX_VISITS);
             try (SceneWorld.Opened scene = SceneWorld.open(ctx, "savvy-copper-golems", "storage-room")) {
                 scene.world().getServer().runOnServer(s -> Stations.summon(s, scene, ID, TAG, 0, "minecraft:cobblestone 16"));
                 Stations.waitUntil(ctx, scene, 150, s -> Stations.hand(s, TAG).isEmpty());
                 String got = scene.world().getServer().computeOnServer(s -> state(s, scene));
-                if (!got.equals("golem 0, shulker 21")) throw new AssertionError(ID + " with the limit at 20: should end golem 0, shulker 21; was " + got);
+                if (!got.equals("golem 0, shulker 21")) throw new AssertionError(ID + " with the default limit: should end golem 0, shulker 21; was " + got);
             }
         } finally {
-            SavvyConfig.setMaxVisits(SavvyConfig.VANILLA_MAX_VISITS);
+            SavvyConfig.setMaxVisits(SavvyConfig.DEFAULT_MAX_VISITS);
         }
     }
 

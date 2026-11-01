@@ -82,7 +82,7 @@ public class SettingsChecks implements FabricClientGameTest {
         SavvyConfig.setPlacedShulkers(true);
         SavvyConfig.setHorizontalRange(SavvyConfig.VANILLA_HORIZONTAL);
         SavvyConfig.setVerticalRange(SavvyConfig.VANILLA_VERTICAL);
-        SavvyConfig.setMaxVisits(SavvyConfig.VANILLA_MAX_VISITS);
+        SavvyConfig.setMaxVisits(SavvyConfig.DEFAULT_MAX_VISITS);
     }
 
     /** The golems are summoned by the test, not the scene; see {@link Stations#summon}. */

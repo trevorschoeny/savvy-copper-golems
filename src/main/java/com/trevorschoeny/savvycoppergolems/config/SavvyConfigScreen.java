@@ -62,12 +62,12 @@ public final class SavvyConfigScreen {
         OptionGroup limits = OptionGroup.createBuilder()
                 .name(Component.literal("How far golems look"))
                 .description(OptionDescription.of(Component.literal(
-                        "Vanilla's numbers are the defaults. Bigger numbers mean more work for the server.")))
+                        "Vanilla's numbers are the defaults, except containers checked. Bigger numbers mean more work for the server.")))
                 .option(intOption("Containers checked",
                         "How many containers a golem checks without finding a place for its item "
                                 + "before it rests and starts over. Vanilla: "
                                 + SavvyConfig.VANILLA_MAX_VISITS + "." + SERVER_NOTE,
-                        SavvyConfig.VANILLA_MAX_VISITS, SavvyConfig.MAX_VISITS_CAP,
+                        SavvyConfig.DEFAULT_MAX_VISITS, SavvyConfig.MAX_VISITS_CAP,
                         SavvyConfig::maxVisits, SavvyConfig::setMaxVisits))
                 .option(intOption("Sideways range",
                         "How far a golem looks for containers in each direction, in blocks. Vanilla: "

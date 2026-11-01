@@ -17,7 +17,7 @@ import java.nio.file.Path;
 /**
  * Savvy Copper Golems settings: sorting into shulkers stored in containers
  * and the two extra targets, all on by default; crammed golems staying stacked (on); how much a golem carries and its three search
- * limits, defaulting to vanilla's numbers. Same static-field + JSON shape as the other house
+ * limits, defaulting to vanilla's numbers except containers checked (32). Same static-field + JSON shape as the other house
  * mods, persisted to {@code config/savvycoppergolems/config.json}.
  *
  * <p>Everything here is read on the server, where the golem's AI runs. On a dedicated server
@@ -35,6 +35,10 @@ public final class SavvyConfig {
     public static final int VANILLA_HORIZONTAL = 32;
     public static final int VANILLA_VERTICAL = 8;
     public static final int VANILLA_CARRY = 16;
+
+    // Containers checked by default: vanilla's 10 gives up before reaching the far end of a
+    // storage room of chests, barrels and placed shulker boxes.
+    public static final int DEFAULT_MAX_VISITS = 32;
 
     // Caps keep a typo from making every golem scan hundreds of chunks per search.
     public static final int MAX_VISITS_CAP = 64;
@@ -55,7 +59,7 @@ public final class SavvyConfig {
     // Golems sort into placed shulker boxes (never a shulker box into one).
     private static boolean placedShulkers = true;
     // Containers a golem checks without finding a match before it rests and starts over.
-    private static int maxVisits = VANILLA_MAX_VISITS;
+    private static int maxVisits = DEFAULT_MAX_VISITS;
     // How far a golem looks for containers, sideways and up or down, in blocks.
     private static int horizontalRange = VANILLA_HORIZONTAL;
     private static int verticalRange = VANILLA_VERTICAL;
