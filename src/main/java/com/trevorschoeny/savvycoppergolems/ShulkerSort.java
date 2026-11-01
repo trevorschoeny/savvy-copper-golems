@@ -78,6 +78,20 @@ public final class ShulkerSort {
         return left;
     }
 
+    /**
+     * Whether the whole held stack would go into the chest, without changing it: {@link #insert}
+     * when shulkers count, vanilla's slot-order fill when they don't. Only meaningful once the
+     * chest has matched.
+     */
+    public static boolean fitsWhole(Container chest, ItemStack held, boolean shulkers) {
+        SimpleContainer copy = new SimpleContainer(chest.getContainerSize());
+        for (int slot = 0; slot < chest.getContainerSize(); slot++) copy.setItem(slot, chest.getItem(slot).copy());
+        if (shulkers) return insert(copy, held).isEmpty();
+        ItemStack left = held.copy();
+        for (int slot = 0; slot < copy.getContainerSize() && !left.isEmpty(); slot++) left = fill(copy, slot, left);
+        return left.isEmpty();
+    }
+
     /** Vanilla's per-slot fill: an empty slot takes it all, a matching stack is topped up. */
     private static ItemStack fill(Container container, int slot, ItemStack stack) {
         ItemStack there = container.getItem(slot);

@@ -1,5 +1,3 @@
-*First release, not yet through Trev's walk or the smoke.*
-
 ### 1.0.0
 
 First release.

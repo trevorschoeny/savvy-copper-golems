@@ -103,8 +103,11 @@ abstract class TransportItemsBetweenContainersMixin {
      * nearest first, that is empty or already holds it, so an empty chest as near as the item's
      * own chest can take it: in the usual 3x3 chest-wall sorter the hopper's input chest behind the
      * golem is exactly as far as the two top corners, and the corner items end up back in the
-     * input. So when the pick is empty and an unchecked container in range already takes the held
-     * item, the golem goes there instead. Items with no home still go to the nearest empty one.
+     * input. So when the pick is empty and an unchecked container in range already holds the held
+     * item and has room for all of it, the golem goes there instead. Items with no home still go to
+     * the nearest empty one. Room for all of it keeps this a reordering only: the visit always ends
+     * with the hand empty, which clears the golem's visited list, so it never costs a visit from the
+     * search limit, and full chests of the item can't hold the golem back from an empty one.
      */
     @ModifyReturnValue(method = "getTransportTarget", at = @At("RETURN"))
     private Optional<TransportItemTarget> savvycoppergolems$orNearerExtra(Optional<TransportItemTarget> vanilla, ServerLevel level, PathfinderMob body) {
@@ -149,11 +152,17 @@ abstract class TransportItemsBetweenContainersMixin {
         return best;
     }
 
-    /** Whether the container already holds what the golem carries: the rule in {@link #savvycoppergolems$orAShulkerTakes}, without vanilla's "or empty". */
+    /**
+     * Whether the container already holds what the golem carries (the rule in
+     * {@link #savvycoppergolems$orAShulkerTakes}, without vanilla's "or empty") and the whole held
+     * stack would go in.
+     */
     private static boolean holdsAHomeFor(PathfinderMob body, Container container) {
         ItemStack held = body.getMainHandItem();
         if (ExtraTargets.refuses(container, held)) return false;
-        return hasItemMatchingHandItem(body, container) || SavvyConfig.shulkersInside() && ShulkerSort.aShulkerTakes(container, held);
+        boolean shulkers = SavvyConfig.shulkersInside();
+        return (hasItemMatchingHandItem(body, container) || shulkers && ShulkerSort.aShulkerTakes(container, held))
+                && ShulkerSort.fitsWhole(container, held, shulkers);
     }
 
     // ---- How far a golem looks ------------------------------------------------------------
