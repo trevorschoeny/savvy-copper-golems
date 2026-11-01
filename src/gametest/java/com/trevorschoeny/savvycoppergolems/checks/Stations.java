@@ -34,7 +34,11 @@ final class Stations {
 
     /** Waits up to a minute for the server's world to reach a state; the checks after it say whether it did. */
     static void waitUntil(ClientGameTestContext ctx, SceneWorld.Opened scene, Predicate<MinecraftServer> done) {
-        for (int t = 0; t < 60 && !scene.world().getServer().computeOnServer(done::test); t++) ctx.waitTicks(20);
+        waitUntil(ctx, scene, 60, done);
+    }
+
+    static void waitUntil(ClientGameTestContext ctx, SceneWorld.Opened scene, int seconds, Predicate<MinecraftServer> done) {
+        for (int t = 0; t < seconds && !scene.world().getServer().computeOnServer(done::test); t++) ctx.waitTicks(20);
     }
 
     private static boolean allEmpty(MinecraftServer s, String[] tags) {

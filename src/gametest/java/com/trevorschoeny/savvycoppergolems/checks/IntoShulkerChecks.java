@@ -24,14 +24,21 @@ public class IntoShulkerChecks implements FabricClientGameTest {
             // A golem waits 60 ticks at a chest before it acts; give them all a generous minute.
             Stations.waitForEmptyHands(ctx, scene, EMPTIES);
             ctx.waitTicks(100);   // the no-match golem has had its look at its chest too
+            // The sorters start empty-handed, so they're done once the cobblestone is in the shulker.
+            Stations.waitUntil(ctx, scene, s -> sorted(s, scene, "savvycoppergolems:from_copper_chest")
+                    && sorted(s, scene, "savvycoppergolems:double_chest") && sorted(s, scene, "savvycoppergolems:after_decoy"));
             scene.world().getServer().runOnServer(s -> {
                 check(s, scene, "savvycoppergolems:into_shulker", 0, 21, -1, 0);
                 check(s, scene, "savvycoppergolems:loose_first", 1, 5, 0, 21);
                 check(s, scene, "savvycoppergolems:shulker_first", 0, 21, 1, 5);
                 check(s, scene, "savvycoppergolems:full_falls_through", 1, 21, -1, 0);
                 check(s, scene, "savvycoppergolems:empty_shulker", 0, 16, -1, 0);
+                check(s, scene, "savvycoppergolems:from_copper_chest", 0, 21, -1, 0);
+                check(s, scene, "savvycoppergolems:double_chest", 0, 21, -1, 0);
+                check(s, scene, "savvycoppergolems:after_decoy", 0, 21, -1, 0);
                 noMatch(s, scene);
                 noNesting(s, scene);
+                stacked(s, scene);
             });
         }
     }
@@ -53,6 +60,10 @@ public class IntoShulkerChecks implements FabricClientGameTest {
         }
     }
 
+    private static boolean sorted(MinecraftServer s, SceneWorld.Opened scene, String id) {
+        return Stations.cobble(Stations.contents(Stations.container(s, scene, id).getItem(0))) == 21;
+    }
+
     /** Station no_match: a shulker of dirt doesn't make the chest a match, so the golem keeps its 16. */
     private static void noMatch(MinecraftServer s, SceneWorld.Opened scene) {
         String id = "savvycoppergolems:no_match";
@@ -60,6 +71,16 @@ public class IntoShulkerChecks implements FabricClientGameTest {
         if (!held.is(Items.COBBLESTONE) || held.getCount() != 16) throw new AssertionError(id + ": golem should still hold 16 cobblestone; holds " + held);
         Container chest = Stations.container(s, scene, id);
         if (Stations.cobble(Stations.contents(chest.getItem(0))) != 0) throw new AssertionError(id + ": cobblestone went into the dirt shulker");
+    }
+
+    /** Station stacked_shulkers: a stack of two boxes shares one contents, so the golem leaves it alone. */
+    private static void stacked(MinecraftServer s, SceneWorld.Opened scene) {
+        String id = "savvycoppergolems:stacked_shulkers";
+        ItemStack held = Stations.hand(s, "ssg_stacked");
+        if (!held.is(Items.COBBLESTONE) || held.getCount() != 16) throw new AssertionError(id + ": golem should still hold 16 cobblestone; holds " + held);
+        ItemStack stack = Stations.container(s, scene, id).getItem(0);
+        int in = Stations.cobble(Stations.contents(stack));
+        if (stack.getCount() != 2 || in != 5) throw new AssertionError(id + ": should be 2 boxes sharing 5 cobblestone; is " + stack.getCount() + " sharing " + in);
     }
 
     /** Station no_nesting: a held shulker box goes in the first free chest slot, never inside a shulker. */

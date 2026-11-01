@@ -8,6 +8,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import testgallery.SceneWorld;
 
 /**
@@ -27,6 +28,7 @@ public class MoreTargetChecks implements FabricClientGameTest {
                 loose(s, scene, "savvycoppergolems:barrel", 21);
                 loose(s, scene, "savvycoppergolems:barrel_covered", 21);
                 loose(s, scene, "savvycoppergolems:placed_shulker", 21);
+                lidClosed(s, scene);
                 shulkerInBarrel(s, scene);
                 lidBlocked(s, scene);
                 placedNoNesting(s, scene);
@@ -39,6 +41,13 @@ public class MoreTargetChecks implements FabricClientGameTest {
     private static void loose(MinecraftServer s, SceneWorld.Opened scene, String id, int want) {
         int have = Stations.looseCobble(Stations.container(s, scene, id));
         if (have != want) throw new AssertionError(id + ": should hold " + want + " cobblestone; holds " + have);
+    }
+
+    /** Station placed_shulker: the golem closes the box after its visit. */
+    private static void lidClosed(MinecraftServer s, SceneWorld.Opened scene) {
+        String id = "savvycoppergolems:placed_shulker";
+        if (!(Stations.container(s, scene, id) instanceof ShulkerBoxBlockEntity box) || !box.isClosed())
+            throw new AssertionError(id + ": the shulker box should be closed again after the golem's visit");
     }
 
     /** Station shulker_in_barrel: the shulker in slot 0 took all 16, the barrel has no loose cobblestone. */

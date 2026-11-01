@@ -94,9 +94,13 @@ public final class ShulkerSort {
         return stack;
     }
 
-    /** A shulker box stack's contents as a container, or null if the stack isn't a shulker box. */
+    /**
+     * A shulker box's contents as a container, or null if the stack isn't a single shulker box.
+     * A stack of several (only possible through commands or other mods) shares one contents
+     * component, so filling it would copy the items into every box in the stack.
+     */
     private static SimpleContainer contents(ItemStack stack) {
-        if (!(stack.getItem() instanceof BlockItem item && item.getBlock() instanceof ShulkerBoxBlock)) return null;
+        if (!(stack.getItem() instanceof BlockItem item && item.getBlock() instanceof ShulkerBoxBlock) || stack.getCount() != 1) return null;
         ItemContainerContents contents = stack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
         // 27 slots, or more if the box already holds more (Shulker Palette's extra rows).
         SimpleContainer box = new SimpleContainer(Math.max(27, contents.size()));
