@@ -20,8 +20,8 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 /**
- * Not a check: a long diagnostic run of Trev's sorter cell (scene chest-wall), twelve golems
- * stacked on the stair, the copper chest refilled with his wall's items whenever it runs dry.
+ * Not a check: a long diagnostic run of the sorter cell (scene chest-wall), twelve golems
+ * stacked on the stair, the copper chest refilled with the wall's items whenever it runs dry.
  * Logs every target a golem picks (with its position and the distance), every time it queues
  * behind another golem, every container it marks unreachable, every rest, and counts what lands
  * in each container. Run it alone by listing it as the only gametest entrypoint.

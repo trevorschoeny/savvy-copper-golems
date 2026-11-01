@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Check for the chest-wall scene (test-gallery/scenes/savvy-copper-golems/chest-wall.json), Trev's
+ * Check for the chest-wall scene (test-gallery/scenes/savvy-copper-golems/chest-wall.json), a
  * 3x3 sorter cell. From the golem's stair the hopper's empty input chest behind it is exactly as
  * far as the two top-corner chests, and vanilla drops an item into the nearest container that is
  * empty or holds it, so on a tie or a hair behind centre the corner's items go to the input chest.
