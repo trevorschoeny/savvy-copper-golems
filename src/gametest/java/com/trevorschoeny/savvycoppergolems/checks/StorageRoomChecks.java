@@ -17,13 +17,13 @@ import testgallery.SceneWorld;
  * so it is the 16th container from the golem.
  *
  * <p>A golem checks containers nearest first and gives up after the search limit, forgetting
- * what it checked. At vanilla's 10 it never reaches the far chest; at this mod's default (32) it
- * does. Barrels count towards the limit, since this mod makes
- * them destinations.
+ * what it checked. At vanilla's 10 it never reaches the far chest; raise the setting (here to 32)
+ * and it does. Barrels count towards the limit, since this mod makes them destinations.
  */
 public class StorageRoomChecks implements FabricClientGameTest {
     private static final String ID = "savvycoppergolems:storage_room";
     private static final String TAG = "scs_room";
+    private static final int RAISED_MAX_VISITS = 32;
 
     @Override
     public void runTest(ClientGameTestContext ctx) {
@@ -37,12 +37,12 @@ public class StorageRoomChecks implements FabricClientGameTest {
                 if (!got.equals("golem 16, shulker 5")) throw new AssertionError(ID + " with vanilla's limit: when the golem first rested it should be golem 16, shulker 5; was " + got);
             }
 
-            SavvyConfig.setMaxVisits(SavvyConfig.DEFAULT_MAX_VISITS);
+            SavvyConfig.setMaxVisits(RAISED_MAX_VISITS);
             try (SceneWorld.Opened scene = SceneWorld.open(ctx, "savvy-copper-golems", "storage-room")) {
                 scene.world().getServer().runOnServer(s -> Stations.summon(s, scene, ID, TAG, 0, "minecraft:cobblestone 16"));
                 Stations.waitUntil(ctx, scene, 150, s -> Stations.hand(s, TAG).isEmpty());
                 String got = scene.world().getServer().computeOnServer(s -> state(s, scene));
-                if (!got.equals("golem 0, shulker 21")) throw new AssertionError(ID + " with the default limit: should end golem 0, shulker 21; was " + got);
+                if (!got.equals("golem 0, shulker 21")) throw new AssertionError(ID + " with a raised limit: should end golem 0, shulker 21; was " + got);
             }
         } finally {
             SavvyConfig.setMaxVisits(SavvyConfig.DEFAULT_MAX_VISITS);
