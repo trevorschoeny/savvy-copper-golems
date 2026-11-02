@@ -1,3 +1,14 @@
+*First release, not yet through Trev's walk or the smoke.*
+
+### 1.0.1
+
+#### Fixed
+
+- A placed shulker box's lid stayed open after a golem's visit; it now closes, the same as vanilla's own containers.
+- Filling a stack of several shulker boxes put the item into every box in the stack instead of treating the stack as a single item.
+- A container stayed open if a golem's visit was interrupted (hurt, leashed, or removed); every end to a visit, including removal, now closes it.
+- In a 3x3 wall of chests, a golem could miss the top corners at random even with room to spare; it now prefers a container that already holds its item and has room for the stack, so corners get found as reliably as the rest of the wall.
+
 ### 1.0.0
 
 First release.

@@ -26,7 +26,7 @@ It only needs to be on the server, so players join with an unmodded game. In sin
 
 #### How far golems look
 
-- How many containers a golem checks, and how far it looks, can be raised or lowered. Vanilla's numbers are the defaults.
+- How many containers a golem checks, and how far it looks, can be raised or lowered. The default for containers checked reaches the far end of a storage room; range keeps vanilla's own numbers.
 
 #### Crammed golems
 
