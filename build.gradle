@@ -2,7 +2,9 @@
 // (on by default) into placed barrels and shulker boxes too. Their search limits are
 // settings. Server-only logic in a universal mod (environment "*"): golem AI runs on the
 // server, vanilla clients need nothing. The client half is only the YACL settings screen.
-// Depends on Fabric API; YACL is bundled. No MenuKit or SlotKit.
+// Depends on Fabric API; YACL is bundled. SlotKit is optional: with it installed, golems
+// honor its reserved, capped and locked slots (SlotKit hooks vanilla's golem; Reservations
+// covers Savvy Copper Golems' own home search).
 //
 // Build: `./gradlew :savvy-copper-golems:build` from the workspace root (the composite
 // build in ~/Projects/Minecraft/Trevlar Mods). Test scene:
@@ -34,6 +36,10 @@ repositories {
     maven { url 'https://api.modrinth.com/maven' }
 }
 
+// SlotKit's client half is added by output, which needs it evaluated first.
+evaluationDependsOn(':menukit')
+evaluationDependsOn(':slotkit')
+
 dependencies {
     // 26.x: the game is unobfuscated, so there is no mappings line and mod deps use
     // the standard java configurations.
@@ -49,6 +55,9 @@ dependencies {
     // YACL, the settings-screen framework, is bundled into the jar (Jar-in-Jar).
     implementation "maven.modrinth:yacl:3.9.7+26.3-fabric"
     include        "maven.modrinth:yacl:3.9.7+26.3-fabric"
+
+    // SlotKit, optional: compiled against, never bundled or required.
+    compileOnly project(':slotkit')
 }
 
 loom {
@@ -79,6 +88,14 @@ fabricApi {
         enableClientGameTests = true
         eula = true
     }
+}
+// The self-checks run with SlotKit (and MenuKit, its own dependency) so they cover a golem
+// honoring a reserved slot. After configureTests, which creates the gametest source set.
+dependencies {
+    gametestImplementation project(':menukit')
+    gametestImplementation project(':slotkit')
+    gametestImplementation rootProject.project(':menukit').sourceSets.client.output
+    gametestImplementation rootProject.project(':slotkit').sourceSets.client.output
 }
 apply from: rootProject.file('Trevlar Mods Codebases/test-gallery/kit/checks.gradle')   // SceneWorld
 

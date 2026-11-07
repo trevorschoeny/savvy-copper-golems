@@ -3,6 +3,7 @@ package com.trevorschoeny.savvycoppergolems.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.trevorschoeny.savvycoppergolems.ExtraTargets;
+import com.trevorschoeny.savvycoppergolems.Reservations;
 import com.trevorschoeny.savvycoppergolems.ShulkerSort;
 import com.trevorschoeny.savvycoppergolems.config.SavvyConfig;
 import net.minecraft.core.GlobalPos;
@@ -108,6 +109,12 @@ abstract class TransportItemsBetweenContainersMixin {
      * the nearest empty one. Room for all of it keeps this a reordering only: the visit always ends
      * with the hand empty, which clears the golem's visited list, so it never costs a visit from the
      * search limit, and full chests of the item can't hold the golem back from an empty one.
+     *
+     * <p>"Holds it" is vanilla's {@code hasItemMatchingHandItem}, which SlotKit widens to a
+     * container with a slot reserved for the item, nested boxes included. So a chest with a
+     * reserved slot is a home like a chest of the item, empty or not, and wins over a plain empty
+     * one. It is a home while its reserved slots have any room, even less than the whole stack:
+     * they fill first and the rest goes on to the next container.
      */
     @ModifyReturnValue(method = "getTransportTarget", at = @At("RETURN"))
     private Optional<TransportItemTarget> savvycoppergolems$orNearerExtra(Optional<TransportItemTarget> vanilla, ServerLevel level, PathfinderMob body) {
@@ -115,10 +122,10 @@ abstract class TransportItemsBetweenContainersMixin {
 
         TransportItemTarget best = vanilla.orElse(null);
         if (ExtraTargets.anyOn()) best = nearest(level, body, best, ExtraTargets::isExtra, target -> true);
-        if (best == null || !best.container().isEmpty()) return Optional.ofNullable(best);
+        if (best == null || !best.container().isEmpty() || hasItemMatchingHandItem(body, best.container())) return Optional.ofNullable(best);
 
         TransportItemTarget home = nearest(level, body, null, be -> be instanceof ChestBlockEntity || ExtraTargets.anyOn() && ExtraTargets.isExtra(be),
-                target -> !target.container().isEmpty() && holdsAHomeFor(body, target.container()));
+                target -> holdsAHomeFor(body, target.container()));
         return Optional.of(home != null ? home : best);
     }
 
@@ -155,14 +162,14 @@ abstract class TransportItemsBetweenContainersMixin {
     /**
      * Whether the container already holds what the golem carries (the rule in
      * {@link #savvycoppergolems$orAShulkerTakes}, without vanilla's "or empty") and the whole held
-     * stack would go in.
+     * stack would go in, or a slot reserved for it has room.
      */
     private static boolean holdsAHomeFor(PathfinderMob body, Container container) {
         ItemStack held = body.getMainHandItem();
         if (ExtraTargets.refuses(container, held)) return false;
         boolean shulkers = SavvyConfig.shulkersInside();
         return (hasItemMatchingHandItem(body, container) || shulkers && ShulkerSort.aShulkerTakes(container, held))
-                && ShulkerSort.fitsWhole(container, held, shulkers);
+                && (ShulkerSort.fitsWhole(container, held, shulkers) || Reservations.wanted(container, held));
     }
 
     // ---- How far a golem looks ------------------------------------------------------------

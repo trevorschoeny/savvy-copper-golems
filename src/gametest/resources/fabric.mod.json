@@ -13,7 +13,11 @@
       "com.trevorschoeny.savvycoppergolems.checks.StorageRoomChecks",
       "com.trevorschoeny.savvycoppergolems.checks.InterruptedVisitChecks",
       "com.trevorschoeny.savvycoppergolems.checks.ChestWallChecks",
-      "com.trevorschoeny.savvycoppergolems.checks.FullHomesChecks"
+      "com.trevorschoeny.savvycoppergolems.checks.FullHomesChecks",
+      "com.trevorschoeny.savvycoppergolems.checks.ReservedSlotChecks"
+    ],
+    "main": [
+      "com.trevorschoeny.savvycoppergolems.checks.ReservedSlotChecks"
     ]
   }
 }

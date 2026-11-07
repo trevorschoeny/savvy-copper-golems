@@ -79,17 +79,27 @@ public final class ShulkerSort {
     }
 
     /**
-     * Whether the whole held stack would go into the chest, without changing it: {@link #insert}
-     * when shulkers count, vanilla's slot-order fill when they don't. Only meaningful once the
-     * chest has matched.
+     * Whether the whole held stack would go into the chest, without changing it: the room in the
+     * slots {@link #insert} walks ("the chest itself" when it takes the item, each shulker that
+     * takes it when shulkers count), or vanilla's walk when they don't. Each slot's room is
+     * {@link Reservations#room}, so a capped or locked slot counts for what it really takes.
+     * Only meaningful once the chest has matched.
      */
     public static boolean fitsWhole(Container chest, ItemStack held, boolean shulkers) {
-        SimpleContainer copy = new SimpleContainer(chest.getContainerSize());
-        for (int slot = 0; slot < chest.getContainerSize(); slot++) copy.setItem(slot, chest.getItem(slot).copy());
-        if (shulkers) return insert(copy, held).isEmpty();
-        ItemStack left = held.copy();
-        for (int slot = 0; slot < copy.getContainerSize() && !left.isEmpty(); slot++) left = fill(copy, slot, left);
-        return left.isEmpty();
+        boolean chestTakes = takes(chest, held);
+        boolean fitsInShulker = shulkers && held.getItem().canFitInsideContainerItems();
+        int room = 0;
+        for (int slot = 0; slot < chest.getContainerSize() && room < held.getCount(); slot++) {
+            ItemStack inSlot = chest.getItem(slot);
+            SimpleContainer box = fitsInShulker ? contents(inSlot) : null;
+            if (box != null) {
+                if (!takes(box, held)) continue;
+                for (int i = 0; i < box.getContainerSize(); i++) room += Reservations.room(inSlot, box, i, held);
+            } else if (chestTakes) {
+                room += Reservations.room(chest, slot, held);
+            }
+        }
+        return room >= held.getCount();
     }
 
     /** Vanilla's per-slot fill: an empty slot takes it all, a matching stack is topped up. */
